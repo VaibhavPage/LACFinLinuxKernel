@@ -148,9 +148,7 @@ int convertStrToLong(char *data) {
 }
 
 int insertLL(node **head, char fingerprint){
-    
     int i = 0;
-
     node *temp;
     node *prev;
 
@@ -160,23 +158,14 @@ int insertLL(node **head, char fingerprint){
 
     if( *head == NULL) {
             *head = (node *)kmalloc(sizeof(node), GFP_KERNEL);
-            /*if(!(*head)) {
-            	printk("RAM & VAIBHAV : ERROR in kmalloc in insertLL\n");
-            	return -1;
-            }*/
             (*head)->fingerprint = fingerprint;
             (*head)->next = NULL;
             return 0;
     }
 
-    while(i < FILTER_COLUMN){
-        
+    while(i < FILTER_COLUMN){        
         if(temp == NULL){
             temp = (node *)kmalloc(sizeof(node), GFP_KERNEL);
-           /* if(!temp) {
-            	printk("RAM & VAIBHAV : ERROR in kmalloc in insertLL\n");
-            	return -1;
-            }*/
             (temp)->fingerprint = fingerprint;
             (temp)->next = NULL;
             prev->next = temp;
@@ -186,15 +175,8 @@ int insertLL(node **head, char fingerprint){
             temp = temp->next;            
         }
         i++;
-
-    }
-
-
-    //printk("\n Insertion exceeded 4");
-
-    
-    return -1;
-        
+    }    
+    return -1;        
 }
 
 
@@ -204,13 +186,11 @@ int removeLL(node **head, char fingerprint){
         return -1;
     } 
     
-    if((*head)->fingerprint == fingerprint){
-        
+    if((*head)->fingerprint == fingerprint){        
         node *temp = *head;
         *head = (*head)->next;
         kfree(temp);        
         return 0;
-
     }
     
     node *temp1 = *head;
@@ -224,10 +204,8 @@ int removeLL(node **head, char fingerprint){
             return 0;
         }
         temp1 = temp1->next;
-    }
-    
+    }    
     return -1;
-    
 }
 
 
@@ -244,8 +222,7 @@ int searchLL(node *head, char fingerprint){
     }
     
     return -1;
-    
-}
+ }
 
 
 /**
@@ -285,91 +262,30 @@ char *md5(char *str, int length) {
   int i;
 
   output = kmalloc(sizeof(char) * 16, GFP_KERNEL);
-  /*if(!output) {
-        printk("RAM & VAIBHAV : ERROR in kmalloc in md5\n");
-  }*/
   memset(output, 0x00, 16);
-
   tfm = crypto_alloc_hash("md5", 0, CRYPTO_ALG_ASYNC);
-
   desc.tfm = tfm;
   desc.flags = 0;
-
   sg_init_one(&sg, str, strlen(str));
   crypto_hash_init(&desc);
-
   crypto_hash_update(&desc, &sg, strlen(str));
   crypto_hash_final(&desc, output);
-
- /* printk("md5 : \n");
-  for(i = 0; i < 16; i++)
-  {
-    printk("%d\n", output[i]);
-  }
-*/
-    
-  //printk("MD5 hash value %s\n" , output);
-  
   crypto_free_hash(tfm);
   return output;
-
 }
 
-
 char *sha(char *item){
-
-   /* struct scatterlist sg;
-    struct crypto_hash *tfm;
-    struct hash_desc desc;
-    char *output;
-    int i;*/
-
     struct scatterlist sg;
 	struct hash_desc desc;
-	//char *plaintext = item;
 	size_t len = strlen(item);
 	char* hashval = kmalloc(sizeof(char) * 20, GFP_KERNEL);;
-
 	sg_init_one(&sg, item, len);
 	desc.tfm = crypto_alloc_hash("sha1", 0, CRYPTO_ALG_ASYNC);
-
 	crypto_hash_init(&desc);
 	crypto_hash_update(&desc, &sg, len);
 	crypto_hash_final(&desc, hashval);
-
 	crypto_free_hash(desc.tfm);
-
 	return hashval;
-
-    //printk(KERN_INFO "sha1: %s\n", __FUNCTION__);
-
-//    output = kmalloc(sizeof(char) * SHA1_LENGTH, GFP_KERNEL);
-    /*if(!output) {
-        printk("RAM & VAIBHAV : ERROR in kmalloc in SHA\n");
-  	}*/
-  /*  memset(output, 0x00, SHA1_LENGTH);
-
-    tfm = crypto_alloc_hash("sha1", 0, CRYPTO_ALG_ASYNC);
-
-    desc.tfm = tfm;
-    desc.flags = 0;
-
-    sg_init_one(&sg, item, strlen(item));
-    crypto_hash_init(&desc);
-
-    crypto_hash_update(&desc, &sg, strlen(item));
-    crypto_hash_final(&desc, output);*/
-/*
-    for (i = 0; i < SHA1_LENGTH; i++) {
-        printk(KERN_ERR "%d-%d\n", output[i], i);
-    }
-*/
-  /*  
-    printk("SHA hash value %s\n" , output);
-    
-    
-    crypto_free_hash(tfm);*/
-    //return output;
 }
 
 
@@ -380,58 +296,18 @@ char *sha(char *item){
 * return  char     Fingerprint
 */
 char generateFingerprint(unsigned int ipKey){
-    
-	++seedValue;
-    //char *item = "123";
+    ++seedValue;
     char* item = convertDecimalToStr(ipKey);
     // Generates MD5 hash
     char* outMD5 = md5(item, strlen(item));
-    
-    // Generates fingerprint
-    //char outFingerprint = fingerprint(outMD5);
-   // printf("\n Hash value of finger print : %s", outMD5);
-   //long long int i = (long long int)kstrtol(outMD5, NULL, 16);      // Position i1
-    
-    //long *i = (long *) kmalloc(sizeof(long), GFP_KERNEL);
-   // snprintf(outMD5, 20, "%d", item);
-    //int i = convertStrToLong(outMD5);   
-
-   /* unsigned long i = 0;
-
-	kstrtol(outMD5, 10, &i);  
-*/
-
-	
-	
     char outt[2];
     outt[0] = outMD5[0];
     outt[1] = '\0';
 
     int k = 0;
-	//printk("Hash \n");
-	
-	/*for (k = 0; k < strlen(outt); k++) {
-        printk("%02x - ", outt[k]);
-    }*/
-
     unsigned long i = convertStrToLong(outt);
-   // kstrtol(outt, 10, &i);  
-
-    /*if(kstrtol(outMD5, 10, &i) != 0)
-    {
-       printk("RAM & VAIBHAV : ERROR IN kstrtol in GF\n");-
-    }*/
-    //printk("GENERATE FINGER PRINT : outMD5 = %s\n", outMD5);
-    //printk("GENERATE FINGER PRINT : i = %u\n", i); 
-    //i = i >> 3;
-    //char cfp = ((i) ^ ((i) >> 10) ^ ((i) >> 20)) & 0xFF;
     char cfp = i & 0xFF;
-   // kfree(outMD5);
-   // kfree(item); 
-    //printk("\n Finger print : %d\n", cfp);
-    
     return cfp;
-    
 }
 
 
@@ -443,73 +319,24 @@ char generateFingerprint(unsigned int ipKey){
 * return  int      Converted Integer
 */
 int getPosition1(unsigned int ipKey, int mode){
-    
-	++seedValue;
+    ++seedValue;
     char* item = convertDecimalToStr(ipKey);
     //char *item = "abc";
     char *hashOutput;
-
-    //item = convertDecimalToStr(ipKey);
       if(mode == 1) {
-        //printk(" GET POSITION 1, MODE = 1\n");
         hashOutput = md5(item, strlen(item));
     }
-    else
-    {
-        //printk(" GET POSITION 1, MODE = 2\n");
+    else {
         hashOutput = sha(item);
     }
-    
-   // int fp = 0;
-
-
     char outt[2];
     outt[0] = hashOutput[0];
     outt[1] = '\0';
-/*
-    int k = 0;
-	printk("Hash \n");
-	for (k = 0; k < strlen(outt); k++) {
-        printk("%02x - ", outt[k]);
-    }*/
-
-    //long *i1 = (long*) kmalloc(sizeof(long), GFP_KERNEL) ;
-    //printf("\n Hash value for position 1 : %s", hashOutput);      
-    //long long int i1 = (long long int)kstrtol(hashOutput, NULL, 16) ;      // Position i1
-    //int i1 = convertStrToLong(hashOutput);
     unsigned long i1 = convertStrToLong(outt);
-
-    
-
-	//kstrtol(outt, 10, &i1);   
-     /*const char *data;
-    data = kmalloc(sizeof(char)*strlen(hashOutput)+1, GFP_KERNEL);
-    int k;
-    for(k = 0; k < strlen(hashOutput); k++) 
-    {
-        data[k] = outMD5[k];
-    }
-
-    data[k] = '\0';
-    if(kstrtol(data, 16, &i1) != 0)
-    {
-        printk("RAM & VAIBHAV : ERROR in kstrtol in gp1\n");
-    } */
-
-    //printk("GET POSITION 1 : hashValue = %s\n", hashOutput);
-    //printk("GET POSITION 1 : i = %u\n", i1); 
-   // i1 = i1 >> 3;
-    //i1 = i1 ^ (i1>>8) ^ (i1>>16);
-    //i1 = (i1 ^ (i1 >> 10) ^ (i1 >> 20) ^ (i1 >> 50) ^ (i1 >> 10));
-
     if(i1 < 0 ) {
       i1 = (i1) * -1;
     }
     i1 = i1 % FILTER_SIZE;
-    //printk("GET POSITION 1 : pos = %d\n", i1);
-  //  kfree(item); 
-  //  kfree(hashOutput);
-
     return i1; 
 }
 
@@ -523,90 +350,29 @@ int getPosition1(unsigned int ipKey, int mode){
 * @param  int      Mode 1 for MD5 , Mode 2 for SHA
 */
 int getPosition2(int i1, char fingerprint, int mode){
-    
-	++seedValue;
-
+    ++seedValue;
     char dummyArr[2];
     dummyArr[0] = fingerprint;
     dummyArr[1] = '\0';
-   
-     //printk("GET POSITION 2, MODE = %d\n", mode); 
     // Generate hex hash
      char *hashOutput = (mode == 1) ? md5(dummyArr, strlen(dummyArr)) : sha(dummyArr);
-   /*  
-    int i = (long long int)strtol(hashOutput, NULL, 16) % FILTER_SIZE;*/
-       
-   //  printf("NOT OK\n");
-
-    //long *i = (long*) kmalloc(sizeof(long), GFP_KERNEL);
-
-   // int i = convertStrToLong(hashOutput);
-    
-	
     char outt[2];
     outt[0] = hashOutput[0];
     outt[1] = '\0';
-
-   /* int k = 0;
-	
-	for (k = 0; k < strlen(outt); k++) {
-        printk("%02x - ", outt[k]);
-    }*/
     unsigned long i =convertStrToLong(outt);
-
-    //kstrtol(outt, 10, &i);
-
-    /*const char *data;
-    data = kmalloc(sizeof(char)*strlen(hashOutput)+1, GFP_KERNEL);
-    int k;
-    
-
-    data[k] = '\0';
-    if(kstrtol(data, 16, &i) != 0)
-    {
-        printk("RAM & VAIBHAV : ERROR in kstrtol in gp2\n");
-    }*/ 
-    //printf("OKK\n");
-    //printk("In GET POSITION 2 : i = %ld\n", i);
-
-     /*i = i >> 3;
-     i = i ^ (i >> 10) ^ (i >> 20);*/
-    //i = (i ^ (i >> 10) ^ (i >> 20) ^ (i >> 50) ^ (i >> 10));
-
-    //printf("OKK 1\n");
-
     if( i < 0 ){
       i = i * -1;
     }
-
     i = i % FILTER_SIZE;
-
-    //printf("OKK 2\n");
-
     int i2 = i1 ^ i;
-    //printk("In GET POSITION 2 : i2 = %d\n", i2);
-    
-    //printf("OKK 3\n");
-
-    //printf("OKK 4\n");    
-
- //   kfree(hashOutput);
-
     if( i2 < 0 ) {
       i2 = i2 * -1;
     }
-    
     if( i2 >= FILTER_SIZE ) {    
     i2 = i2 % FILTER_SIZE;
     }
-    
-    //printk("In GET POSITION 2 : pos2 = %d\n", i2);
-
     return i2;
-    
 }
-
-
 
 /**
 * Add fingerprint to filter
@@ -623,22 +389,16 @@ int getPosition2(int i1, char fingerprint, int mode){
 int addItemLACF(char fingerprint ,int i1, int i2, int i11, int i12){
     
     int addI = addItem(fingerprint, i1, i2, 1);
-   
-    //printk("In ADD ITEM LACF\n"); 
     ++tableCounter;
     
     if(addI == -1)         
-        return -1;    
-    
+        return -1; 
     
     if(i11 != -1 && i12 != -1){        
         ++tableCounter;
         return addItem(fingerprint,i11,i12, 2) == -1 ? -1 : 0;
-        
     }
-        
-    return 0;
-            
+    return 0;   
 }
 
 
@@ -656,17 +416,11 @@ int addItem(char fingerprint, int i1, int i2, int mode){
     
     int n = 0;
 
-    
     if(insertLL(&filter[i1], fingerprint) == 0){
-        //printk("ADD ITEM, Inserted at Position i1 / i11 : %d\n", i1);
-        
       return i1;
     }
-    
-   
+
     if(insertLL(&filter[i2], fingerprint) == 0 ){
-        //printk("ADD ITEM, Inserted at Position i2 / i12 : %d\n", i2);
-         
         return i2;
     }
 
@@ -677,24 +431,15 @@ int addItem(char fingerprint, int i1, int i2, int mode){
     char *hashOutput;
     
     for(n = 0; n < MAXNUMKICKS; n++){
-                    
-        
         char temp = (filter[bucketPos])->fingerprint;
         (filter[bucketPos])->fingerprint = fingerprint;
         fingerprint = temp;   
-        bucketPos = getPosition2(bucketPos, fingerprint, mode);      
-                
+        bucketPos = getPosition2(bucketPos, fingerprint, mode);
         if(insertLL(&filter[bucketPos], fingerprint) == 0){
-            //printk("ADD ITEM  fingerprint %d is kicked to %d\n",fingerprint, bucketPos);
             return bucketPos;
         }
-        
     }
-    
-    //printk("ADD ITEM Max kicks %d\n",n);
-    
     return -1;
-    
 }
 
 
@@ -703,30 +448,19 @@ int addItem(char fingerprint, int i1, int i2, int mode){
 *
 * Returns bucket index or -1 if not found
 */
-int lookupItemCuckoo(unsigned int item){   
-   
-    //printk("LOOK UP ITEM CUCKOO : item = %08x\n", item); 
+int lookupItemCuckoo(unsigned int item){
     ++lookupAccess;
-
     int i1 = getPosition1(item, 1);
     char fingerprint = generateFingerprint(item);
-    
     int i2 = getPosition2(i1, fingerprint, 1);
-    
-    //printk("LOOK UP ITEM CUCKOO : Lookup I1 %d and I2 %d\n", i1, i2);
-    
     if(searchLL(filter[i1], fingerprint) == 0) {       
        return i1;
     }
-
     if(searchLL(filter[i2], fingerprint) == 0){       
        return i2; 
     }
-     
     return -1;
-    
 }
-
 
 int getLengthOfString(char *str){
 	int length = 0;
@@ -740,18 +474,11 @@ int getLengthOfString(char *str){
 int lookupItemLACF(unsigned int item, int length){
 		
     int popularity = findPopularity(length);
-    
-    //printk("LOOKUP ITEM LACF : %08x\n", item);    
-    //printk("POPULARITY : %d\n", popularity);    
-        
     if(popularity == 1){       
         return (lookupItemCuckoo(item) == -1 ? -1 : 0);     
     } else {
-       // printf("Ok\n");
         return (lookupItemCuckoo(item) == -1 || lookupItemLACFNonPopular(item) == -1 ? -1 : 0);
-           
-    }    
-        
+    }
 }
 
 
@@ -761,27 +488,13 @@ int lookupItemLACF(unsigned int item, int length){
 * Returns bucket index or -1 if not found
 */
 int lookupItemLACFNonPopular(unsigned int item){
-    
-   // printf("Inside NONPOP \n");
-
-    ++lookupAccess;
-	    
-    char fingerprint = generateFingerprint(item);
-       
-    //printf("Working till here \n");   
-       
+    ++lookupAccess;	    
+    char fingerprint = generateFingerprint(item);       
     int i11 = getPosition1(item, 2);
-    //printf("Working till here 1\n");
     int i12 = getPosition2(i11, fingerprint, 2);
-    
-    //printf("Working till here 2\n");
-    
-    //printk("\n Lookup I11 %d and I12 %d", i11, i12);
-    
     if( searchLL(filter[i11], fingerprint) > -1){
         return i11;
-    }
-    
+    }    
     if(searchLL(filter[i12], fingerprint) > -1 ){
         return i12;  
     }    
@@ -794,23 +507,16 @@ int lookupItemLACFNonPopular(unsigned int item){
 */
 int removeItem(unsigned int item, int (*lookup)(unsigned int)){
     
-    int bucketIndex = lookup(item);
-    
-    //printf("\nbucket index %d ", bucketIndex);
-    
-    char fingerprnt = generateFingerprint(item);
-    
+    int bucketIndex = lookup(item);    
+    char fingerprnt = generateFingerprint(item);    
     if(bucketIndex != -1){
-        int i = 0;
-       
+        int i = 0;       
         if(removeLL(&filter[bucketIndex], fingerprnt) == 0) {
             return 0;
         } else {
             return -1;
-        }
-            
+        }            
     } else {
-       // printf("\n Can not delete the item as it is not present in the filter");
         return -1;
     }    
 }
@@ -822,18 +528,12 @@ int removeItem(unsigned int item, int (*lookup)(unsigned int)){
 */
 int removeItemLACF(unsigned int item, int length){
     
-    int popularity = findPopularity(length);
-    
-    if(removeItem(item, lookupItemCuckoo) == -1) return -1;
-    
-    if(popularity == 2){
-        
-        return removeItem(item, lookupItemLACFNonPopular) == -1 ? -1 : 0;
-                                
+    int popularity = findPopularity(length);    
+    if(removeItem(item, lookupItemCuckoo) == -1) return -1;    
+    if(popularity == 2){        
+        return removeItem(item, lookupItemLACFNonPopular) == -1 ? -1 : 0;                                
     }
-    
-    return 0;
-    
+    return 0;    
 }
 
 
